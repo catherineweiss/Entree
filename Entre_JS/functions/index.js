@@ -201,6 +201,11 @@ function sendMail(){
 
 setTimeout(sendMail, 25000) ;  
 // sgMail.send(msg);  
+
+//TODO Update week+1
+
+
+
 if (matchesToMake.length > 1){
   res.status(200).send("We got more than 1 object");
 } else
