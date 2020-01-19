@@ -109,28 +109,63 @@ const cors = require("cors")({
 });
 
 exports.welcomeMS5 = functions.https.onRequest((req, res) => {
-  let week = 2; 
+  let week = 1; 
+  var emailData ;
+  var personalizations_values = [] ;
+
   sgMail.setApiKey("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");
   email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
 
-      let emailData = snapshot.val();
-      let emailReceipients = [emailData.email1, emailData.email2]
+    emailData = snapshot.val();
+    // personalizations_values.push({
+    //   to: emailData.email1,
+    //   dynamic_template_data:{
+    //     name1: emailData.name1,
+    //     name2: emailData.name2
+    //   } 
+    // }) ;
 
-          const msg = {
-            to: emailReceipients,
-            from: "catweiss@seas.upenn.edu",
-            subject: "Email sent to Week 1 Matches" ,
-            templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
-            dynamic_template_data:{
-              name1: emailData.name1,
-              name2: emailData.name2
-            }
-          };
 
-          sgMail.send(msg);
-          console.log('Success!') ;
-    res.status(200).send("success");
-  })
+
+  });
+  personalizations_values = [
+    {
+      to: [
+        {
+          email: "cweisspa@gmail.com"
+        }
+      ],
+      subject: "Hello, World Again!"      
+    },
+    {
+      to: [
+        {
+          email: "walkerclaire24@gmail.com"
+        },
+        {
+          email: "catweiss@seas.upenn.edu"
+        }
+      ],
+      subject: "Hello, World ONE!"
+    }
+  ] ;
+//call send message
+  var msg = {
+    personalizations: personalizations_values,
+    from: "catweiss@seas.upenn.edu",
+//  subject: "Email sent to Week 1 Matches" ,
+    templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
+  };
+sgMail.send(msg);  
+if (personalizations_values.length > 1){
+  res.status(200).send("We got more than 1 object");
+} else
+    res.status(404).send("1 or fewer objects");
+
+ 
+
+          
+  
   
 });
 
