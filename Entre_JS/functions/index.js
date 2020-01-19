@@ -108,6 +108,57 @@ const cors = require("cors")({
   origin: true
 });
 
+exports.welcomeMS5 = functions.https.onRequest((req, res) => {
+  let week = 2; 
+  sgMail.setApiKey("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");
+  email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
+
+      let emailData = snapshot.val();
+      let emailReceipients = [emailData.email1, emailData.email2]
+
+          const msg = {
+            to: emailReceipients,
+            from: "catweiss@seas.upenn.edu",
+            subject: "Email sent to Week 1 Matches" ,
+            templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
+            dynamic_template_data:{
+              name1: emailData.name1,
+              name2: emailData.name2
+            }
+          };
+
+          sgMail.send(msg);
+          console.log('Success!') ;
+    res.status(200).send("success");
+  })
+  
+});
+
+exports.welcomeMS4 = functions.https.onRequest((req, res) => {
+    let week = 2; 
+    sgMail.setApiKey("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");
+    email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
+
+        let emailData = snapshot.val();
+        let emailReceipients = [emailData.email1, emailData.email2]
+
+            const msg = {
+              to: emailReceipients,
+              from: "catweiss@seas.upenn.edu",
+              subject: "Email sent to Week 1 Matches" ,
+              templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
+              dynamic_template_data:{
+                name1: emailData.name1,
+                name2: emailData.name2
+              }
+            };
+
+            sgMail.send(msg);
+            console.log('Success!') ;
+      res.status(200).send("success");
+    })
+    
+});  
 
 //******** 
 
@@ -133,80 +184,55 @@ const cors = require("cors")({
 // });
 
 
+//exports.welcomeMessageWithDB = functions.https.onRequest((req, res) => {
+  //const matches = await admin.firestore().collection('emailLineup').get(); //TODO query based on week
+  
+  //put for loop, iterate through all matches from Week 'x'
+  //const email = matches.docs.map(snap => snap.data().email1)
 
-exports.welcomeMessageWithDB = functions.https.onRequest((req, res) => {
-    //const matches = await admin.firestore().collection('emailLineup').get(); //TODO query based on week
+
+
+
+
+
+
+
+
+// exports.welcomeMessageWithDB = functions.https.onRequest((req, res) => {
+//     //const matches = await admin.firestore().collection('emailLineup').get(); //TODO query based on week
     
-    //put for loop, iterate through all matches from Week 'x'
-    //const email = matches.docs.map(snap => snap.data().email1)
+//     //put for loop, iterate through all matches from Week 'x'
+//     //const email = matches.docs.map(snap => snap.data().email1)
 
-    var emailReceipients = [];
-    var week = 1; 
+//     var matches = [];
+//     var week = 1; 
 
-    email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
+//     email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
     
-        var emailData = snapshot.val();
-        console.log(emailData);
+//         var emailData = snapshot.val();
+//         console.log(emailData);
     
-    });
+//     });
 
-    // use forEach to add email addresses to emailRecipients
-    emailData.array.forEach(element => {
-        emailReceipients.push() ;
-    });
+//     // use forEach to add email addresses to emailRecipients
+//     emailData.array.forEach(element => {
+//       //call function that sends email
+      
+//       matches.push() ;
+//     });
     
 
 
 
-    // get remainder of content from DB and store in local variables. This will be added to email message content
+//     // get remainder of content from DB and store in local variables. This will be added to email message content
 
 
-    return cors(req, res, () => {
-      const msg = {
-        to: emailReceipients,
-        from: "catweiss@seas.upenn.edu",
-        subject: "Email sent to Week 1 Matches" ,
-        templateId: 'd-e52ab14ef8ad4331b809a2dda425778e'
-      };
-      sgMail.setApiKey(
-        "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"
-      );
-      sgMail.send(msg);
-      res.status(200).send("success");
-    }).catch(() => {
-      res.status(500).send("error");
-    });
-});
-
-// exports.emailMessage = functions.https.onRequest((req, res) => {
-//     const db = admin.firestore() 
-//     return db.collection('emailLineup').doc('3')
-//                 .get()
-//                 .then(doc => {
-//                     const match_data = doc.data() 
-//                     const msg = {
-//                         to: [match_data.email1, match_data.email2],
-//                         from: "catweiss@seas.upenn.edu", 
-//                         templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
-//                         substitutionWrappers: ['{{', '}}'] ,
-//                         substitutions: {
-//                             name1: match_data.name1 ,
-//                             name2: match_data.name2
-//                         }
-//                     };
-//                     return sgMail.send(msg)
-//                 }) 
-//                 .then(() => console.log('email sent!'))
-//                 .catch(err => console.log(err))
-//     const { name, email, phone, message } = req.body;
 //     return cors(req, res, () => {
 //       const msg = {
-//         to: "catweiss@seas.upenn.edu",
-//         from: "catweiss+1@seas.upenn.edu",
-//         subject: `${name} sent you a new message`,
-//         templateId: 'd-847407afa980405f8e124b7a80991534'
-//         // text: text,
-//         // html: text
+//         to: emailReceipients,
+//         from: "catweiss@seas.upenn.edu",
+//         subject: "Email sent to Week 1 Matches" ,
+//         templateId: 'd-e52ab14ef8ad4331b809a2dda425778e'
 //       };
 //       sgMail.setApiKey(
 //         "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"
@@ -216,4 +242,5 @@ exports.welcomeMessageWithDB = functions.https.onRequest((req, res) => {
 //     }).catch(() => {
 //       res.status(500).send("error");
 //     });
-//   });
+// });
+
