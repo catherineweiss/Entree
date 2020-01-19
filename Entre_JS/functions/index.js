@@ -111,12 +111,30 @@ const cors = require("cors")({
 exports.welcomeMS5 = functions.https.onRequest((req, res) => {
   let week = 1; 
   var emailData ;
+  var matchesToMake = [] ;
   var personalizations_values = [] ;
 
   sgMail.setApiKey("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");
+
+  var msg = {
+    personalizations: personalizations_values,
+    from: "catweiss@seas.upenn.edu",
+//  subject: "Email sent to Week 1 Matches" ,
+    templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
+  };
+
   email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
 
     emailData = snapshot.val();
+    msg.personalizations.push(
+      {
+        to: [{email: emailData.email1}, {email: emailData.email2}] ,
+        dynamic_template_data:{
+          name1: emailData.name1,
+          name2: emailData.name2
+        }
+       }
+    ) ;
     // personalizations_values.push({
     //   to: emailData.email1,
     //   dynamic_template_data:{
@@ -125,48 +143,68 @@ exports.welcomeMS5 = functions.https.onRequest((req, res) => {
     //   } 
     // }) ;
 
-
-
+  //  matchesToMake.push(emailData);
   });
-  personalizations_values = [
-    {
-      to: [
-        {
-          email: "cweisspa@gmail.com"
-        }
-      ],
-      subject: "Hello, World Again!"      
-    },
-    {
-      to: [
-        {
-          email: "walkerclaire24@gmail.com"
-        },
-        {
-          email: "catweiss@seas.upenn.edu"
-        }
-      ],
-      subject: "Hello, World ONE!"
-    }
-  ] ;
+
+
+//  matchesToMake.forEach(el => {
+//    personalizations_values.push(
+//      {
+//       to: [{email: el.email1}, {email: el.email2}] ,
+//       dynamic_template_data:{
+//         name1: el.name1,
+//         name2: el.name2
+//       }
+//      }
+//    )
+//  }) 
+
+
+  // personalizations_values = [
+  //   {
+  //     to: [
+  //       {
+  //         email: "catherine.f.weiss@gmail.com"
+  //       },
+  //       {
+  //         email: "girri@seas.upenn.edu"
+  //       }
+  //     ],
+  //     dynamic_template_data:{
+  //       name1: "Catherine",
+  //       name2: "Girri"
+  //     },
+  //     subject: "Hello, World Again!"      
+  //   },
+  //   {
+  //     to: [
+  //       {
+  //         email: "walkerclaire24@gmail.com"
+  //       },
+  //       {
+  //         email: "catweiss@seas.upenn.edu"
+  //       }
+  //     ],
+  //     dynamic_template_data:{
+  //       name1: "Catherine",
+  //       name2: "Girri"
+  //     },
+  //     subject: "Hello, World ONE!"
+  //   }
+  // ] ;
+
 //call send message
-  var msg = {
-    personalizations: personalizations_values,
-    from: "catweiss@seas.upenn.edu",
-//  subject: "Email sent to Week 1 Matches" ,
-    templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
-  };
-sgMail.send(msg);  
-if (personalizations_values.length > 1){
+
+function sendMail(){
+  sgMail.send(msg);
+}
+
+setTimeout(sendMail, 25000) ;  
+// sgMail.send(msg);  
+if (matchesToMake.length > 1){
   res.status(200).send("We got more than 1 object");
 } else
     res.status(404).send("1 or fewer objects");
-
- 
-
-          
-  
-  
 });
 
 exports.welcomeMS4 = functions.https.onRequest((req, res) => {
