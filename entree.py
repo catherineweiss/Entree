@@ -10,8 +10,9 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import spacy
+import sys
 
-
+    
 
 
 
@@ -28,6 +29,15 @@ def init_database_and_nlp():
 
 
 
+def init_database():
+    """ Just initializes firebase database connection; does NOT load spacy NLP
+        module.
+    """
+    cred = credentials.Certificate('service_account_credentials.json')
+    firebase_admin.initialize_app(cred, {'databaseURL' : 'https://entreehackathon.firebaseio.com'})
+    
+
+
 
 def gen_and_save_scores(nlp):
     """ Generates scores for all possible matches and saves them to the
@@ -40,21 +50,23 @@ def gen_and_save_scores(nlp):
 
 
 
-def make_and_save_matches(week=1):
+def make_and_save_matches(week=1, algorithm=2):
     """ Generates matches, populates emailLineup, and then updates the
         preference table by setting match score for the match that was made to
         -100 (so it does not happen again).
     """
-    matches = make_matches()
+    if algorithm == 1: matches, totalScore, no_matches = make_matches1()
+    elif algorithm == 2: matches, totalScore, no_matches = make_matches2()
+    else: 
+        print("Invalid algorithm.")
+        return
     save_matches_update_preferences(matches, week)
 
 
 
 
-
 def clear_emailLineup():
-    """ Deletes all data from the emailLineup.  Used for development and
-        debugging.
+    """ Deletes all emailLineup data.  Used for development and debugging.
     """
     email_list = db.reference('emailLineup')
     email_list.set({})
@@ -75,11 +87,12 @@ def gen_scores(nlp):
     # Load all data from intake_data database
     data = db.reference().get()['register']
     
-    # Loop through all entries in the intake_data
+    # Loop through all entries in the intake_data; key1 is the person for
+    # whom we are evaluating matches
     for key1 in data:
         match_dict = {}
 
-        # Loop through all entries in the intake_data
+        # Loop through all entries in the intake_data; key2 is the second person
         for key2 in data:
             if key1 == key2: continue # Skip when person1 == person2
             match_dict[key2] = score_match(key1, key2, data, nlp)
@@ -95,7 +108,7 @@ def gen_scores(nlp):
 
 
 def score_match(key1, key2, data, nlp):
-    """ Scores matches between two people.
+    """ Scores a potential match between two people.
         key1 is the ID of person1
         key2 is the ID of person2
         data is the dictionary with all data from intake_data
@@ -109,8 +122,10 @@ def score_match(key1, key2, data, nlp):
         RETURNS the numerical score for the match
     """
 
+    # Initialize variable to hold the score for the match
     score = 0
 
+    # Get the intake data for person1 and person2
     p1 = data[key1]
     p2 = data[key2]
 
@@ -172,32 +187,90 @@ def format_score_dict(score_dict, data):
 
 
 
-def make_matches():
+def make_matches1():
 
     scores = load_scores()
-    
     already_matched = []
     matches = []
+    no_matches = []
+    totalScore = 0
 
     # Loop through 
     for key in scores:
         if key in already_matched: continue
 
-        maxScore = -99
+        maxScore = -500
         for key2 in scores[key]:
             if key2 in already_matched: continue
             if scores[key][key2] > maxScore: 
                 maxScore = scores[key][key2]
                 matchID = key2
 
+        # If there is no match, add to the no_matches list and move on to the
+        # next iteration.
+        if maxScore < 0:
+            no_matches.append(key)
+            continue
+
         already_matched.append(key)
         already_matched.append(matchID)
 
         matches.append((key, matchID, maxScore))
+        
+        totalScore += maxScore
 
     matches_formatted = format_matches(matches)
 
-    return matches_formatted
+    print("Number of matches:", len(matches_formatted))
+    print("Total match score:", totalScore)
+    if len(matches_formatted) > 0: average = totalScore / len(matches_formatted)
+    else: average = 0
+    print("Average match score:", average)
+
+    return matches_formatted, totalScore, no_matches
+
+
+
+
+
+def make_matches2():
+
+    scores = load_scores()
+    all_scores = []
+    already_matched = []
+    totalScore = 0
+    matches = []
+    no_matches = []
+
+    for key1 in scores:
+        for key2 in scores[key1]:
+            all_scores.append((scores[key1][key2], key1, key2))
+
+    all_scores = sorted(all_scores, reverse=True)
+
+    for row in all_scores:
+
+        if (row[1] in already_matched) or (row[2] in already_matched): continue
+
+        # If the match score is below zero, do not add the match
+        if row[0] < 0:
+            no_matches.append(row[1])
+            continue
+    
+        matches.append((row[1], row[2], row[0]))
+        already_matched.append(row[1])
+        already_matched.append(row[2])
+        totalScore += row[0]
+
+    matches_formatted = format_matches(matches)
+
+    print("Number of matches:", len(matches_formatted))
+    print("Total match score:", totalScore)
+    if len(matches_formatted) > 0: average = totalScore / len(matches_formatted)
+    else: average = 0
+    print("Average match score:", average)
+
+    return matches_formatted, totalScore, []
 
 
 
@@ -232,4 +305,37 @@ def format_matches(match_list):
         new_list.append((id1, name1, email1, id2, name2, email2))
     return new_list
 
+
+
+
+
+if __name__ == "__main__":
+    
+    if len(sys.argv) < 2:
+        print("Error: Usage: python entree.py <COMMAND>")
+        command = 'none'
+    else: command = sys.argv[1]
+
+
+    if command == 'none':
+        pass
+
+    elif command.lower() == 'genscores':
+        nlp = init_database_and_nlp()
+        gen_and_save_scores(nlp)
+
+    elif command.lower() == 'makematches':
+        if len(sys.argv) < 3:
+            print("Error: Usage: python entree.py makematches <WEEK>")
+        else:
+            week = int(sys.argv[2])
+            init_database()
+            make_and_save_matches(week, 2)
+
+    elif command.lower() == 'clearemails':
+        init_database()
+        clear_emailLineup()
+
+    else:
+        print("Error: invalid command.  Valid commands are 'genscores', 'makematches', and 'clearemails'")
 
