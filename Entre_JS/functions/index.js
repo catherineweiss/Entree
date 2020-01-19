@@ -25,19 +25,21 @@ const cors = require("cors")({
   origin: true
 });
 
-exports.matching2 = functions.https.onRequest((req, res) => {
+// Create Cloud Function to Trigger Emails Being Sent Week 1
+exports.matching1 = functions.https.onRequest((req, res) => {
   let week = 1; 
   var emailData ;
   var matchesToMake = [] ;
   var personalizations_values = [] ;
 
-  sgMail.setApiKey("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");
+  //  sgMail.setApiKey("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"); //Girri's
+sgMail.setApiKey("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");
 
   var msg = {
     personalizations: personalizations_values,
-    from: "catweiss@seas.upenn.edu",
-//  subject: "Email sent to Week 1 Matches" ,
-    templateId: 'd-e52ab14ef8ad4331b809a2dda425778e', 
+    from: "girri@seas.upenn.edu",
+    //templateId: 'd-e52ab14ef8ad4331b809a2dda425778e',
+    templateId: 'd-82231e3bb66c4768bfc130946cf1590a' 
   };
 
   email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
@@ -63,10 +65,142 @@ function sendMail(){
 }
 
 setTimeout(sendMail, 25000) ;  
-setTimeout(res.status(200).send("Success"), 27000) ;
+//setTimeout(res.status(200).send("Success"), 27000) ;
+
+ });
+
+// Create Cloud Function to Trigger Emails Being Sent Week 4
+exports.matching4 = functions.https.onRequest((req, res) => {
+  let week = 4; 
+  var emailData ;
+  var matchesToMake = [] ;
+  var personalizations_values = [] ;
+
+  //  sgMail.setApiKey("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"); //Girri's
+sgMail.setApiKey("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");
+
+  var msg = {
+    personalizations: personalizations_values,
+    from: "girri@seas.upenn.edu",
+    //templateId: 'd-e52ab14ef8ad4331b809a2dda425778e',
+    templateId: 'd-82231e3bb66c4768bfc130946cf1590a' 
+  };
+
+  email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
+
+    emailData = snapshot.val();
+    msg.personalizations.push(
+      {
+        to: [{email: emailData.email1}, {email: emailData.email2}] ,
+        dynamic_template_data:{
+          name1: emailData.name1,
+          name2: emailData.name2
+        }
+       }
+    ) ;
+
+  });
+
+
+//call send message function
+
+function sendMail(){
+  sgMail.send(msg);
+}
+
+setTimeout(sendMail, 25000) ;  
+//setTimeout(res.status(200).send("Success"), 27000) ;
 
  });
  
+
+// Create Cloud Function to Trigger Emails Being Sent Week 6
+exports.matching6 = functions.https.onRequest((req, res) => {
+  let week = 6; 
+  var emailData ;
+  var matchesToMake = [] ;
+  var personalizations_values = [] ;
+
+  //  sgMail.setApiKey("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"); //Girri's
+sgMail.setApiKey("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");
+
+  var msg = {
+    personalizations: personalizations_values,
+    from: "girri@seas.upenn.edu",
+    //templateId: 'd-e52ab14ef8ad4331b809a2dda425778e',
+    templateId: 'd-82231e3bb66c4768bfc130946cf1590a' 
+  };
+
+  email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
+
+    emailData = snapshot.val();
+    msg.personalizations.push(
+      {
+        to: [{email: emailData.email1}, {email: emailData.email2}] ,
+        dynamic_template_data:{
+          name1: emailData.name1,
+          name2: emailData.name2
+        }
+       }
+    ) ;
+
+  });
+
+
+//call send message function
+
+function sendMail(){
+  sgMail.send(msg);
+}
+
+setTimeout(sendMail, 25000) ;  
+//setTimeout(res.status(200).send("Success"), 27000) ;
+
+ }); 
+
+ // Create Cloud Function to Trigger Emails Being Sent Week 5
+exports.matching5 = functions.https.onRequest((req, res) => {
+  let week = 5; 
+  var emailData ;
+  var matchesToMake = [] ;
+  var personalizations_values = [] ;
+
+//  sgMail.setApiKey("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"); //Girri's
+  sgMail.setApiKey("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");
+
+  var msg = {
+    personalizations: personalizations_values,
+    from: "girri@seas.upenn.edu",
+    //templateId: 'd-e52ab14ef8ad4331b809a2dda425778e',
+    templateId: 'd-82231e3bb66c4768bfc130946cf1590a' 
+  };
+
+  email.orderByChild("week").equalTo(week).on("child_added", function(snapshot){
+
+    emailData = snapshot.val();
+    msg.personalizations.push(
+      {
+        to: [{email: emailData.email1}, {email: emailData.email2}] ,
+        dynamic_template_data:{
+          name1: emailData.name1,
+          name2: emailData.name2
+        }
+       }
+    ) ;
+
+  });
+
+
+//call send message function
+
+function sendMail(){
+  sgMail.send(msg);
+}
+
+setTimeout(sendMail, 25000) ;  
+//setTimeout(res.status(200).send("Success"), 27000) ;
+
+ });
 
 // Cloud Function to send Welcome Message. Not Using.
 // exports.welcomeMessage = functions.https.onRequest((req, res) => {
