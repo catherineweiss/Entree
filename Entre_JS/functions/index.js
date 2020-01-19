@@ -1,22 +1,18 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 const functions = require('firebase-functions');
 
-// Add Firebase SDK
+// Access private API keys 
+var config = require('./config.js');
 
+// Add Firebase SDK
 var firebase = require("firebase");
+
 // Import Admin SDK
 var admin = require("firebase-admin");
-var config = {
-    apiKey: "AIzaSyD1hFb1qK-M07j6N9d1jErVsSirUC4-Aio",
-    authDomain: "entreehackathon.firebaseapp.com",
-    databaseURL: "https://entreehackathon.firebaseio.com",
-    projectId: "entreehackathon",
-    storageBucket: "entreehackathon.appspot.com",
-    messagingSenderId: "714748315315",
-    appId: "1:714748315315:web:b3074f38e932a6cf3612c6",
-  };
 
 var app = firebase.initializeApp(config);
+console.log(config) ;
+
 
 // Access database with email information
 var db = admin.database(app);
