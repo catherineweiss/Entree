@@ -34,7 +34,7 @@ Girri Panalyipan, Catherine Weiss, Claire Walker, Samuel Attal, Daniel Ciarrocki
 
 
 Workflow:
-1. Users register for website at WEBSITE address
+1. Users register for website at: entreehackathon.firebaseapp.com
 2. From a shell: python entree.py genscores
 This will regenerate the preference table from scratch (i.e.,
     it will score all of the matches).  PLEASE NOTE this will overwrite matches
