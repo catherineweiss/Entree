@@ -33,3 +33,17 @@ Development Team:
 Girri Panalyipan, Catherine Weiss, Claire Walker, Samuel Attal, Daniel Ciarrocki
 
 
+Workflow:
+1. Users register for website at WEBSITE address
+2. From a shell: python entree.py genscores
+This will regenerate the preference table from scratch (i.e.,
+    it will score all of the matches).  PLEASE NOTE this will overwrite matches
+    already in the preference table.
+3. From a shell: python entree.py makematches <WEEK>  
+where <WEEK> is an integer for the week number
+    This command will make a set of matches, populate the emailLineup with
+    those matches, and update the preference table so that the score of the
+    match will be -100 (so it will not happen again)
+4. python entree.py clearemails: deletes entire contents of the emailLineup.  Useful for
+    development and debugging.
+5. Run a Firebase cloud function. This will send emails. Either schedule, or make http request with browser window.  
